@@ -1,13 +1,15 @@
 package hello.hellospring.service;
 
 import hello.hellospring.domain.Member;
+import hello.hellospring.repository.MemberRepository;
 import hello.hellospring.repository.MemoryMemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemberServiceTest {
@@ -15,44 +17,37 @@ class MemberServiceTest {
     MemoryMemberRepository memberRepository;
 
     @BeforeEach
-    void beforeEach() {
+    public void beforeEach() {
         memberRepository = new MemoryMemberRepository();
         memberService = new MemberService(memberRepository);
     }
 
     @AfterEach
-    void afterEach() {
+    public void afterEach() {
         memberRepository.clearStore();
     }
 
-
     @Test
     void join() {
-        // given
-        Member member = new Member();
-        member.setName("afreecatv");
+        Member member1 = new Member();
+        member1.setName("spring1");
+        Long join = memberService.join(member1);
 
-        // when
-        Long id = memberService.join(member);
-
-        // then
-        Assertions.assertThat(id).isEqualTo(member.getId());
+        Member findMember = memberService.findOne(join).get();
+        assertThat(member1.getName()).isEqualTo(findMember.getName());
     }
 
     @Test
-    void validateDuplicateMember() {
+    void joinFail() {
         Member member1 = new Member();
-        member1.setName("afreecatv");
+        member1.setName("spring1");
         memberService.join(member1);
 
         Member member2 = new Member();
-        member2.setName("afreecatv2");
-        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, () -> memberService.join(member1));
-        assertThat(illegalStateException.getMessage()).isEqualTo("이미 존재하는 회원입니다");
-
-//        Assertions.assertThatThrownBy(()->memberService.join(member2), "예외가 발생하지 않았다.");
+        member2.setName("spring1");
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> memberService.join(member2));
+        assertThat(e.getMessage()).isEqualTo("이미 존재하는 회원입니다.");
     }
-
     @Test
     void findMembers() {
     }
