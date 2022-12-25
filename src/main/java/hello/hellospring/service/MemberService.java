@@ -2,10 +2,12 @@ package hello.hellospring.service;
 
 import hello.hellospring.domain.Member;
 import hello.hellospring.repository.MemberRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional // JPA에서 저장하거나 변경할때 항상 트랜젝션이 걸려 있어야함
 public class MemberService {
 
     public final MemberRepository memberRepository;
